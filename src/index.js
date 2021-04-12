@@ -2,7 +2,10 @@ const express = require('express')
 const morgan = require('morgan')
 const exphbs = require('express-handlebars')
 const path = require('path')
-
+const flash = require('connect-flash')
+const session = require('express-session')
+const myqslSec = require('express-mysql-session')
+const { database } = require('./keys')
 
 // initialization
 const app = express()
@@ -21,6 +24,13 @@ app.set('port', process.env.PORT || '4000')
 
 
 // middlewears
+app.use(session({
+    secret: 'oscarnodesql',
+    resave: false,
+    saveUninitialized: false,
+    store: new myqslSec(database)
+}))
+app.use(flash())
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
@@ -28,7 +38,7 @@ app.use(express.json())
 
 // global variables
 app.use((req, res, next) => {
-
+    app.locals.success = req.flash('success')
     next()
 })
 

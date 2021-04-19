@@ -6,9 +6,12 @@ const flash = require('connect-flash')
 const session = require('express-session')
 const myqslSec = require('express-mysql-session')
 const { database } = require('./keys')
+const passport = require('passport')
+
 
 // initialization
 const app = express()
+require('./lib/passport')
 
 // setting
 app.set('views', path.join(__dirname, 'views'))
@@ -34,11 +37,15 @@ app.use(flash())
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 // global variables
 app.use((req, res, next) => {
     app.locals.success = req.flash('success')
+    app.locals.erro = req.flash('error')
+    app.locals.user = req.user
     next()
 })
 
